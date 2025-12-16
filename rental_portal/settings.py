@@ -12,7 +12,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
-    'https://rental-portal-5ma1.onrender.com'  # my current active render  URL
+    'rental-portal-5ma1.onrender.com'  # my current active render  URL
 ]
 
 # Application definition
