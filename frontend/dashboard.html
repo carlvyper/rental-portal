@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+</head>
+<body>
+    <div class="app-layout">
+        
+        <aside class="sidebar">
+            <div class="logo">Rental Portal</div>
+            <nav class="main-nav">
+                <a href="dashboard.html" class="nav-item active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="pay-rent.html" class="nav-item"><i class="fas fa-money-check-alt"></i> <span>Pay Rent</span></a>
+                <a href="payment-history.html" class="nav-item"><i class="fas fa-history"></i> <span>Payment History</span></a>
+                <a href="submit-complaint.html" class="nav-item"><i class="fas fa-wrench"></i> <span>Complaints</span></a>
+                <a href="submit-request.html" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests</span></a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> <span>Notifications</span></a>
+                <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+            </nav>
+            <button class="btn logout-btn" id="logoutButton" onclick="handleLogout()">Log Out</button>
+        </aside>
+
+        <main class="content-area">
+            <header class="page-header">
+                <h1>Welcome, <span id="tenantUsername">Loading...</span></h1>
+                <p>Overview of your current rental status and quick actions.</p>
+            </header>
+
+            <section class="dashboard-stats">
+                <h2>Your Current Status</h2>
+                
+                <div class="stat-card">
+                    <h3>Unread Notifications</h3>
+                    <p id="notificationCount">---</p>
+                    <a href="notifications.html">View All Alerts</a>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Open Complaints</h3>
+                    <p id="open-complaints-count">---</p>
+                    <a href="submit-complaint.html">Manage Complaints</a>
+                </div>
+            </section>
+
+            <section class="quick-actions">
+                <h2>Quick Actions</h2>
+                <a href="pay-rent.html" class="card action-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Submit Rent Payment</span>
+                </a>
+                <a href="submit-request.html" class="card action-item">
+                    <i class="fas fa-tools"></i>
+                    <span>Lodge Maintenance Request</span>
+                </a>
+                <a href="payment-history.html" class="card action-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Review Payment History</span>
+                </a>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Rental Portal</p>
+        </footer>
+    </div>
+
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

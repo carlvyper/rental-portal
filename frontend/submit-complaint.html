@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint | Rental Portal</title>
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+</head>
+<body>
+    <div class="app-layout">
+        
+        <aside class="sidebar">
+            <div class="logo">Rental Portal</div>
+            <nav class="main-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="pay-rent.html" class="nav-item"><i class="fas fa-money-check-alt"></i> <span>Pay Rent</span></a>
+                <a href="payment-history.html" class="nav-item"><i class="fas fa-history"></i> <span>Payment History</span></a>
+                <a href="submit-complaint.html" class="nav-item active"><i class="fas fa-wrench"></i> <span>Complaints</span></a>
+                <a href="submit-request.html" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests</span></a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> <span>Notifications</span></a>
+                <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+            </nav>
+            <button class="btn logout-btn" onclick="handleLogout()">Log Out</button>
+        </aside>
+
+        <main class="content-area">
+            <header class="page-header">
+                <h1>Report a Complaint</h1>
+                <p>Please provide details about the issue. We'll get back to you as soon as possible.</p>
+            </header>
+
+            <div class="card form-card">
+                <form id="complaintForm" method="POST" action="/api/complaints/submit">
+                    
+                    <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="[BACKEND_GENERATED_TOKEN]">
+                    
+                    <div class="form-group">
+                        <label for="complaintType">Select Complaint Type</label>
+                        <select id="complaintType" name="type" required>
+                            <option value="" disabled selected>Choose a category...</option>
+                            <option value="Plumbing">Plumbing / Leaks</option>
+                            <option value="Electrical">Electrical Issue</option>
+                            <option value="Appliance">Appliance Repair</option>
+                            <option value="Noise">Noise / Neighbor Issue</option>
+                            <option value="Common Area">Common Area Issue (Hallway, Gym)</option>
+                            <option value="Security">Security Concern</option>
+                            <option value="Other">Other Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Detailed Message</label>
+                        <textarea id="description" name="description" rows="8" required placeholder="Describe the issue in detail (location, severity, time of occurrence, etc.)."></textarea>
+                    </div>
+
+                    <div id="message" class="message-area" style="display: none;"></div>
+                    
+                    <button type="submit" class="btn primary-btn" id="submitButton">
+                        Submit Complaint
+                    </button>
+                </form>
+            </div>
+            </main>
+    </div>
+
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/submit-complaint.js"></script>
+</body>
+</html>

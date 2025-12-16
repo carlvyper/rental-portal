@@ -1,0 +1,648 @@
+/* assets/css/style.css */
+
+/* =========================================
+   1. CORE VARIABLES AND RESET
+   ========================================= */
+:root {
+    --primary-color: #007bff; /* Blue */
+    --secondary-color: #6c757d; /* Gray */
+    --success-color: #28a745; /* Green */
+    --danger-color: #dc3545; /* Red */
+    --warning-color: #ffc107; /* Yellow */
+    
+    /* Backgrounds */
+    --background-light: #f8f9fa; /* General light background */
+    --background-dark: #343a40; /* Sidebar background */
+    --background-page: #f0f0f5; /* Main content area background (Light Grey) */
+    --background-highlight: #e7f5ff; /* Light blue tint for unread/hover */
+    --card-background: #ffffff;
+    
+    /* Text/Borders */
+    --text-color: #333; /* Dark text */
+    --text-light: #666; /* Light text (descriptions/hints) */
+    --text-muted: #999; /* Muted text (dates/timestamps) */
+    --border-color: #e9ecef;
+}
+
+/* Base Styles */
+html, body {
+    /* CRITICAL FIX: Ensure full viewport height and prevent overall scroll */
+    height: 100%; 
+    overflow: hidden; 
+    margin: 0;
+    padding: 0;
+    
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-page); 
+    color: var(--text-color);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+/* =========================================
+   2. LAYOUT STRUCTURE (App Layout, Sidebar, Content Area)
+   ========================================= */
+.app-layout {
+    display: flex;
+    /* CRITICAL FIX: Force height to 100% of the viewport */
+    height: 100vh; 
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--background-dark);
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    /* Ensure sidebar is sticky and doesn't scroll */
+    overflow-y: auto; 
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.main-nav {
+    /* FIX: Added flex-grow to push the logout button to the bottom */
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 15px 20px;
+    color: #ced4da;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-item i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-item:hover {
+    background-color: #495057;
+    color: white;
+}
+
+.nav-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-left: 5px solid var(--warning-color);
+}
+
+.logout-btn {
+    width: calc(100% - 40px);
+    margin: 15px 20px 20px 20px;
+    padding: 12px 20px;
+    background-color: var(--danger-color);
+    border: none;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.content-area {
+    flex-grow: 1;
+    padding: 25px; 
+    /* CRITICAL FIX: Enable internal scrolling only when content overflows */
+    overflow-y: auto;
+    background-color: var(--background-page); 
+}
+
+.page-header {
+    margin-bottom: 15px; 
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem; 
+}
+
+.page-header p {
+    color: var(--text-light);
+    margin: 5px 0 15px 0;
+}
+
+/* =========================================
+   3. CARDS, FORMS, AND BUTTONS
+   ========================================= */
+
+.card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.card h2, .card h3 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], input[type="month"], textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    text-align: center;
+}
+
+.btn.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: 1px solid var(--primary-color);
+    width: 100%; 
+}
+
+.btn.primary-btn:hover {
+    background-color: #0056b3;
+}
+
+.btn.secondary-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: 1px solid var(--secondary-color);
+}
+
+.btn.secondary-btn:hover {
+    background-color: #5a6268;
+}
+
+/* =========================================
+   4. DASHBOARD SPECIFIC STYLES
+   ========================================= */
+.dashboard-stats, .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 20px; 
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid var(--primary-color);
+}
+
+.stat-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    border-bottom: none;
+}
+
+.stat-card p {
+    font-size: 2.2rem; 
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 120px; 
+    padding: 15px; 
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.action-item i {
+    font-size: 2rem; 
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.action-item:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-5px);
+}
+
+.action-item:hover i, .action-item:hover a {
+    color: white;
+}
+
+/* =========================================
+   5. MESSAGE/ALERT STYLES
+   ========================================= */
+.message-area {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    min-height: 40px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 1rem;
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+/* =========================================
+   5. MESSAGE/ALERT STYLES (Cleaned up for VS Code)
+   ========================================= */
+.message-area {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    min-height: 40px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 1rem;
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+.message-area.success {
+    /* Correct, standard success colors */
+    background-color: #e6ffed; 
+    color: #155724; 
+    border-color: #c3e6cb; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-area.error {
+    /* Correct, standard error colors */
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-area.info {
+    /* Correct, standard info colors */
+    background-color: #e2e8f0;
+    color: #2d3748;
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.message-area.error {
+    /* Correct, standard error colors */
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-area.info {
+    /* Correct, standard info colors */
+    background-color: #e2e8f0;
+    color: #2d3748;
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   6. TABLES AND TAGS (Payment History, Complaints)
+   ========================================= */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: var(--background-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.status-tag {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-tag.Paid, .status-tag.Resolved, .status-tag.success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.status-tag.Pending, .status-tag.Open, .status-tag.Medium {
+    background-color: var(--warning-color);
+    color: #856404;
+}
+
+.status-tag.Failed, .status-tag.High {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* =========================================
+   7. NOTIFICATION LIST STYLES 
+   ========================================= */
+.notification-list {
+    list-style: none;
+    padding: 0; 
+    margin: 0; 
+    display: flex;
+    flex-direction: column;
+    gap: 1px; 
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: 0; 
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.notification-item:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.notification-item:hover {
+    background-color: var(--background-light);
+}
+
+.notification-item.unread {
+    background-color: var(--background-highlight); 
+    border-left: 5px solid var(--primary-color);
+    font-weight: 600;
+}
+
+.notification-item.unread:hover {
+    background-color: #dbeaff; 
+}
+
+.notification-item .icon { 
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-right: 15px;
+    padding-top: 5px;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-content h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.notification-content p {
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.notification-content .timestamp {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    color: var(--text-muted); 
+}
+
+/* Styling for the Mark All Read button */
+#markAllReadBtn {
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px 15px;
+    margin-top: 20px;
+}
+
+/* =========================================
+   8. PAY RENT AND UTILITY STYLES
+   ========================================= */
+
+.payment-form-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+input#phone:invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+input#phone:valid {
+    border-color: var(--success-color);
+}
+
+#stk-status-message {
+    background-color: #fff3cd; 
+    color: #856404; 
+    border: 1px solid #ffeeba;
+    font-weight: 600;
+}
+
+#stk-status-message i {
+    margin-right: 8px;
+}
+
+.payment-form-card .primary-btn {
+    width: 100%;
+}
+
+.text-center { text-align: center; }
+
+
+/* =========================================
+   9. RESPONSIVE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 992px) {
+    /* Tablet/Narrow desktop sidebar collapse */
+    .sidebar {
+        width: 80px;
+        padding: 10px 0;
+    }
+    .logo {
+        display: none; 
+    }
+    .main-nav {
+        align-items: center;
+    }
+    .nav-item {
+        justify-content: center;
+        padding: 15px 10px;
+    }
+    .nav-item i {
+        margin: 0;
+    }
+    .nav-item span {
+        display: none; 
+    }
+    .nav-item.active {
+        border-left: none;
+        border-right: 5px solid var(--warning-color);
+    }
+    .content-area {
+        padding: 20px;
+    }
+    .logout-btn {
+        width: 60px;
+        padding: 10px;
+        margin: 10px auto;
+        font-size: 0; 
+        border-radius: 50%;
+        height: 40px;
+        line-height: 1;
+    }
+    .logout-btn::before {
+        content: "\f08b"; 
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobile - Stack layout */
+    .app-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        bottom: 0;
+        z-index: 100;
+        background-color: var(--background-dark); 
+    }
+    .main-nav {
+        flex-direction: row;
+        width: 80%;
+        justify-content: space-around;
+        flex-grow: unset;
+    }
+    .nav-item {
+        padding: 10px;
+        width: auto;
+    }
+    .nav-item.active {
+        border: none;
+        border-top: 3px solid var(--warning-color);
+    }
+    .logout-btn {
+        display: none; 
+    }
+    .content-area {
+        padding-bottom: 80px; 
+        overflow-y: unset; 
+        min-height: calc(100vh - 80px); 
+    }
+    .dashboard-stats, .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+/* Auth Pages (Login/Register) */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e9ecef;
+}
+
+.login-card {
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.login-card h2 {
+    color: var(--primary-color);
+}
+
+.login-card p {
+    margin-bottom: 30px;
+    color: var(--text-light);
+}
