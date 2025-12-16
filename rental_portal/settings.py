@@ -12,7 +12,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
-    'faef476751b2.ngrok-free.app'  # Your current active Ngrok URL
+    'https://rental-portal-5ma1.onrender.com'  # my current active render  URL
 ]
 
 # Application definition
@@ -96,6 +96,7 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True 
 CORS_ALLOW_CREDENTIALS = True 
 CSRF_TRUSTED_ORIGINS = [
+    "https://rental-portal-5ma1.onrender.com",
     "https://faef476751b2.ngrok-free.app", # Add Ngrok to trusted origins
     "http://127.0.0.1:8000",
     "http://127.0.0.1:5500",  # <--- ADD THIS (VS Code Live Server)
@@ -122,6 +123,6 @@ MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c91
 
 # THE CALLBACK BRIDGE
 # Safaricom will send the result of your PIN entry here
-MPESA_CALLBACK_URL = 'https://faef476751b2.ngrok-free.app/api/stk-callback/'
+MPESA_CALLBACK_URL = 'https://rental-portal-5ma1.onrender.com/api/stk-callback/'
 # REFERENCE ONLY: Your Sandbox Whitelisted Number
 # TEST_PHONE_NUMBER = '254799802804'
