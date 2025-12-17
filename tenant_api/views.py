@@ -2,7 +2,7 @@ import json
 import re 
 import io
 from django.conf import settings
-from django.shortcuts import render  # Required for home_page
+from django.shortcuts import render 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -12,6 +12,7 @@ from rest_framework import generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes
 
 from reportlab.pdfgen import canvas
 from django_daraja.mpesa.core import MpesaClient
@@ -141,7 +142,6 @@ def initiate_stk_push(request):
         amount = int(float(data.get('amount')))
         phone_number = str(data.get('phone_number')).strip()
         
-        # Phone cleaning logic
         clean_phone = re.sub(r'\D', '', phone_number)
         if clean_phone.startswith('0'): 
             formatted_phone = '254' + clean_phone[1:]
@@ -150,7 +150,6 @@ def initiate_stk_push(request):
         else:
             formatted_phone = clean_phone
 
-        # Get Tenant Profile for the logged-in user
         tenant_profile = None
         if request.user.is_authenticated:
             tenant_profile, _ = TenantProfile.objects.get_or_create(user=request.user)
@@ -201,21 +200,20 @@ def stk_callback(request):
             transaction = MpesaTransaction.objects.filter(checkout_request_id=checkout_id).first()
             
             if transaction:
-                transaction.callback_data = data # Store raw JSON for debug
+                transaction.callback_data = data 
                 if result_code == 0:
                     transaction.status = 'COMPLETED'
                     metadata = stk_data['CallbackMetadata']['Item']
                     receipt = next(item['Value'] for item in metadata if item['Name'] == 'MpesaReceiptNumber')
                     transaction.mpesa_receipt_number = receipt
                     
-                    # Create actual Payment entry for history
                     Payment.objects.create(
                         user=transaction.tenant.user,
                         amount=transaction.amount,
                         transaction_id=receipt,
                         payment_method='M-Pesa STK',
                         status='Paid',
-                        month_paid_for=transaction.created_at.date() # Default to current month
+                        month_paid_for=transaction.created_at.date()
                     )
                 else:
                     transaction.status = 'FAILED'
@@ -230,7 +228,6 @@ def stk_callback(request):
 class PaymentHistoryListView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        # Fetch completed MpesaTransactions linked to this user
         transactions = MpesaTransaction.objects.filter(
             tenant__user=request.user, 
             status='COMPLETED'
@@ -272,9 +269,79 @@ def download_receipt(request, transaction_id):
     except Exception:
         return JsonResponse({'error': 'Receipt not found'}, status=404)
 
-# Keep other ListCreateViews (Complaint, Maintenance, Notification) as per your previous logic
 class ComplaintListCreateView(generics.ListCreateAPIView):
     serializer_class = ComplaintSerializer
     permission_classes = [IsAuthenticated]
-    def get_queryset(self): return Complaint.objects.filter(user=self.request.user).order_by('-created_at')
-    def perform_create(self, serializer): serializer.save(user=self.request.user)
+    def get_queryset(self): 
+        return Complaint.objects.filter(user=self.request.user).order_by('-created_at')
+    def perform_create(self, serializer): 
+        serializer.save(user=self.request.user)
+    
+# --- 7. PASSWORD VIEW (CORRECTED INDENTATION) ---
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        new_password = request.data.get("new_password")
+        if new_password:
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"error": "New password required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Add this at the end of tenant_api/views.py
+class PaymentListCreateView(generics.ListCreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # This returns the payments for the logged-in user
+        return Payment.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        # This allows manual payment entry if needed
+        serializer.save(user=self.request.user)
+        
+        # --- 8. MAINTENANCE & NOTIFICATION VIEWS ---
+
+class RequestListCreateView(generics.ListCreateAPIView):
+    """Handles maintenance requests"""
+    serializer_class = MaintenanceRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return MaintenanceRequest.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class NotificationListView(generics.ListCreateAPIView):
+    """Handles user notifications"""
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+    
+    # --- 9. TRANSACTION STATUS CHECK ---
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_payment_status(request, checkout_id):
+    """
+    Checks the status of a specific M-Pesa transaction.
+    Usage: /api/check-payment-status/<checkout_id>/
+    """
+    try:
+        transaction = MpesaTransaction.objects.get(
+            checkout_request_id=checkout_id, 
+            tenant__user=request.user
+        )
+        return Response({
+            "status": transaction.status,
+            "receipt": transaction.mpesa_receipt_number,
+            "amount": transaction.amount
+        }, status=status.HTTP_200_OK)
+    except MpesaTransaction.DoesNotExist:
+        return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
