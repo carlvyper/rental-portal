@@ -29,4 +29,12 @@ urlpatterns = [
     path('check-status/', views.check_payment_status, name='check_status'),
     
     path('download-receipt/<int:payment_id>/', views.download_receipt, name='download-receipt'),
+    path('register/', views.register_page, name='register'),
+    path('dashboard/', views.dashboard_page, name='dashboard'),
+    path('profile/', views.profile_page, name='profile'),
+    path('pay-rent/', views.pay_rent_page, name='pay_rent'),
+    path('payment-history/', views.payment_history_page, name='payment_history'),
+    path('notifications/', views.notifications_page, name='notifications'),
+    path('submit-complaint/', views.submit_complaint_page, name='submit_complaint'),
+    path('submit-request/', views.submit_request_page, name='submit_request'),
 ]

@@ -35,14 +35,34 @@ from .serializers import (
 User = get_user_model()
 
 # --- 2. FRONTEND VIEW ---
+# --- FRONTEND PAGE VIEWS ---
 
 def home_page(request):
-    """
-    Serves the initial login page from your frontend folder.
-    """
     return render(request, 'login.html')
+
 def register_page(request):
     return render(request, 'register.html')
+
+def dashboard_page(request):
+    return render(request, 'dashboard.html')
+
+def profile_page(request):
+    return render(request, 'profile.html')
+
+def pay_rent_page(request):
+    return render(request, 'pay-rent.html')
+
+def payment_history_page(request):
+    return render(request, 'payment-history.html')
+
+def notifications_page(request):
+    return render(request, 'notifications.html')
+
+def submit_complaint_page(request):
+    return render(request, 'submit-complaint.html')
+
+def submit_request_page(request):
+    return render(request, 'submit-request.html')
 
 # --- 3. AUTHENTICATION VIEWS ---
 
