@@ -41,6 +41,8 @@ def home_page(request):
     Serves the initial login page from your frontend folder.
     """
     return render(request, 'login.html')
+def register_page(request):
+    return render(request, 'register.html')
 
 # --- 3. AUTHENTICATION VIEWS ---
 

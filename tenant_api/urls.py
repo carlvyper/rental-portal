@@ -4,6 +4,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.home_page, name='home'),
+    path('register/', views.register_page, name='register'), # This fixes the 404
     # Authentication Endpoints
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
@@ -27,5 +29,4 @@ urlpatterns = [
     path('check-status/', views.check_payment_status, name='check_status'),
     
     path('download-receipt/<int:payment_id>/', views.download_receipt, name='download-receipt'),
-
 ]

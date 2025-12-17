@@ -115,6 +115,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://rental-portal-5ma1.onrender.com",
     "http://127.0.0.1:8000",
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
 ]
 
 # MPESA CONFIG
