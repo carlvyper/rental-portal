@@ -1,3 +1,4 @@
+# tenant_api/views.py
 import json
 import re 
 import io
@@ -17,7 +18,7 @@ from rest_framework.decorators import api_view, permission_classes
 from reportlab.pdfgen import canvas
 from django_daraja.mpesa.core import MpesaClient
 
-# --- 1. ALL IMPORTS (MODELS & SERIALIZERS) ---
+# --- 1. MODELS & SERIALIZERS IMPORTS ---
 from .models import (
     Payment, Complaint, MaintenanceRequest, Notification, TenantProfile,
     MpesaTransaction 
@@ -34,8 +35,7 @@ from .serializers import (
 
 User = get_user_model()
 
-# --- 2. FRONTEND VIEW ---
-# --- FRONTEND PAGE VIEWS ---
+# --- 2. FRONTEND PAGE VIEWS (Rendering HTML) ---
 
 def home_page(request):
     return render(request, 'login.html')
@@ -64,7 +64,10 @@ def submit_complaint_page(request):
 def submit_request_page(request):
     return render(request, 'submit-request.html')
 
-# --- 3. AUTHENTICATION VIEWS ---
+def login_page(request):
+    return render(request, 'login.html')
+
+# --- 3. AUTHENTICATION API VIEWS ---
 
 class RegisterView(APIView):
     authentication_classes = []
@@ -114,7 +117,7 @@ class LogoutView(APIView):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# --- 4. PROFILE & DASHBOARD VIEWS ---
+# --- 4. PROFILE & DASHBOARD API VIEWS ---
 
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated] 
@@ -140,6 +143,17 @@ class UserProfileView(APIView):
             profile.save()
             return Response({'success': True, 'message': 'Profile updated successfully'})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
+        new_password = request.data.get("new_password")
+        if new_password:
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"error": "New password required"}, status=status.HTTP_400_BAD_REQUEST)
 
 class DashboardCountsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -245,26 +259,55 @@ def stk_callback(request):
             return JsonResponse({"ResultCode": 0, "ResultDesc": "Error Handled"})
     return JsonResponse({"ResultCode": 1, "ResultDesc": "Invalid Method"}, status=405)
 
-# --- 6. HISTORY & RECEIPTS ---
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_payment_status(request, checkout_id):
+    try:
+        transaction = MpesaTransaction.objects.get(
+            checkout_request_id=checkout_id, 
+            tenant__user=request.user
+        )
+        return Response({
+            "status": transaction.status,
+            "receipt": transaction.mpesa_receipt_number,
+            "amount": transaction.amount
+        }, status=status.HTTP_200_OK)
+    except MpesaTransaction.DoesNotExist:
+        return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
 
-class PaymentHistoryListView(APIView):
+# --- 6. DATA LIST & CREATE API VIEWS ---
+
+class PaymentListCreateView(generics.ListCreateAPIView):
+    serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
-    def get(self, request):
-        transactions = MpesaTransaction.objects.filter(
-            tenant__user=request.user, 
-            status='COMPLETED'
-        ).order_by('-created_at')
-        
-        data = []
-        for tx in transactions:
-            data.append({
-                'id': tx.id,
-                'date': tx.created_at.strftime('%Y-%m-%d %H:%M'),
-                'amount': tx.amount,
-                'receipt': tx.mpesa_receipt_number,
-                'phone': tx.phone_number
-            })
-        return Response(data)
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user).order_by('-created_at')
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class ComplaintListCreateView(generics.ListCreateAPIView):
+    serializer_class = ComplaintSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self): 
+        return Complaint.objects.filter(user=self.request.user).order_by('-created_at')
+    def perform_create(self, serializer): 
+        serializer.save(user=self.request.user)
+
+class RequestListCreateView(generics.ListCreateAPIView):
+    serializer_class = MaintenanceRequestSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return MaintenanceRequest.objects.filter(user=self.request.user).order_by('-created_at')
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class NotificationListView(generics.ListCreateAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+# --- 7. UTILITIES & RECEIPTS ---
 
 @csrf_exempt
 def download_receipt(request, transaction_id):
@@ -290,80 +333,3 @@ def download_receipt(request, transaction_id):
         return FileResponse(buffer, as_attachment=True, filename=f'Receipt_{transaction.mpesa_receipt_number}.pdf')
     except Exception:
         return JsonResponse({'error': 'Receipt not found'}, status=404)
-
-class ComplaintListCreateView(generics.ListCreateAPIView):
-    serializer_class = ComplaintSerializer
-    permission_classes = [IsAuthenticated]
-    def get_queryset(self): 
-        return Complaint.objects.filter(user=self.request.user).order_by('-created_at')
-    def perform_create(self, serializer): 
-        serializer.save(user=self.request.user)
-    
-# --- 7. PASSWORD VIEW (CORRECTED INDENTATION) ---
-class ChangePasswordView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        user = request.user
-        new_password = request.data.get("new_password")
-        if new_password:
-            user.set_password(new_password)
-            user.save()
-            return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
-        return Response({"error": "New password required"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Add this at the end of tenant_api/views.py
-class PaymentListCreateView(generics.ListCreateAPIView):
-    serializer_class = PaymentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        # This returns the payments for the logged-in user
-        return Payment.objects.filter(user=self.request.user).order_by('-created_at')
-
-    def perform_create(self, serializer):
-        # This allows manual payment entry if needed
-        serializer.save(user=self.request.user)
-        
-        # --- 8. MAINTENANCE & NOTIFICATION VIEWS ---
-
-class RequestListCreateView(generics.ListCreateAPIView):
-    """Handles maintenance requests"""
-    serializer_class = MaintenanceRequestSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return MaintenanceRequest.objects.filter(user=self.request.user).order_by('-created_at')
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class NotificationListView(generics.ListCreateAPIView):
-    """Handles user notifications"""
-    serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
-    
-    # --- 9. TRANSACTION STATUS CHECK ---
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def check_payment_status(request, checkout_id):
-    """
-    Checks the status of a specific M-Pesa transaction.
-    Usage: /api/check-payment-status/<checkout_id>/
-    """
-    try:
-        transaction = MpesaTransaction.objects.get(
-            checkout_request_id=checkout_id, 
-            tenant__user=request.user
-        )
-        return Response({
-            "status": transaction.status,
-            "receipt": transaction.mpesa_receipt_number,
-            "amount": transaction.amount
-        }, status=status.HTTP_200_OK)
-    except MpesaTransaction.DoesNotExist:
-        return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
