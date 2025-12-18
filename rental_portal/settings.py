@@ -131,4 +131,4 @@ MPESA_CALLBACK_URL = 'https://rental-portal-5ma1.onrender.com/api/stk-callback/'
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
+CSRF_COOKIE_SAMESITE = 'None'
