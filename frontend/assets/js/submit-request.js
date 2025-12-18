@@ -11,47 +11,59 @@ async function handleRequestSubmission(e) {
     e.preventDefault();
     
     const submitButton = document.getElementById('submitButton');
-    const originalText = submitButton.textContent;
-    submitButton.textContent = 'Submitting...';
-    submitButton.disabled = true;
+    const originalText = submitButton ? submitButton.textContent : 'Submit Request';
     
-    // --- CSRF FIX: Retrieve and prepare headers ---
-    // 1. Get the token using the function defined in utils.js
+    // UI state: Start loading
+    if (submitButton) {
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+    }
+    
+    // 1. Get the token using the global function from utils.js
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
-        // If the token is missing, display error and stop submission
-        displayMessage('Submission failed: Security token missing. Please refresh the page.', 'error');
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
+        displayMessage('Submission failed: Security token missing. Please log in again.', 'error');
+        if (submitButton) {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        }
         return;
     }
-    // 2. Define the headers object needed for Django authentication
+
     const headers = { 'X-CSRFToken': csrfToken };
-    // --- CSRF FIX END ---
     
-    // Collect data
+    // 2. Collect data
     const form = e.target;
     const data = {
-        // Ensure keys match your Django serializer fields exactly
         request_subject: form.subject.value, 
         urgency: form.urgency.value,
         description: form.description.value,
     };
 
     try {
-        // CRITICAL: Pass the headers as the FOURTH argument to include the CSRF token
+        // 3. Make the API call
         await apiFetch('/requests/', 'POST', data, headers); 
         
-        // --- SUCCESS MESSAGE LOGIC ---
         displayMessage('Maintenance request submitted successfully! We will contact you soon.', 'success');
-        form.reset(); // Clear the form on success
+        form.reset(); 
         
     } catch (error) {
-        // Display any API error messages
-        displayMessage(`Submission failed: ${error.message}`, 'error');
+        console.error('Request submission error:', error.message);
+        
+        let errorMessage = error.message;
+
+        // REDIRECT UPDATED: Handle session expiration
+        if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+            displayMessage('Session expired. Redirecting to login...', 'error');
+            setTimeout(() => { window.location.href = '/'; }, 2000);
+            return;
+        }
+
+        displayMessage(`Submission failed: ${errorMessage}`, 'error');
     } finally {
-        // Reset the button state whether successful or failed
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
+        if (submitButton) {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        }
     }
 }

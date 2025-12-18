@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user is already logged in
     apiFetch('/dashboard-counts/', 'GET')
         .then(() => {
-            window.location.href = 'dashboard.html';
+            // REDIRECT UPDATED: Changed from dashboard.html to /dashboard/
+            window.location.href = '/dashboard/';
         })
         .catch(() => {
             if (loginForm) {
@@ -33,7 +34,8 @@ async function handleLogin(e) {
         });
 
         if (data.success) {
-            window.location.href = 'dashboard.html';
+            // REDIRECT UPDATED: Changed from dashboard.html to /dashboard/
+            window.location.href = '/dashboard/';
         } else {
             throw new Error(data.error || 'Login failed');
         }

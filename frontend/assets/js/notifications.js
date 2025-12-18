@@ -1,7 +1,10 @@
 // assets/js/notifications.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadNotifications();
+    // Only attempt to load if the notification list exists on the page
+    if (document.getElementById('notification-list-ul')) {
+        loadNotifications();
+    }
     
     // Add event listener for the "Mark All as Read" button
     const markAllBtn = document.getElementById('markAllReadBtn');
@@ -16,15 +19,16 @@ const markAllReadBtn = document.getElementById('markAllReadBtn');
 
 /**
  * Renders the notification data into the list.
- * @param {Array<Object>} notifications - Array of notification objects from the API.
  */
 function renderNotifications(notifications) {
+    if (!notificationListUl) return;
+
     notificationListUl.innerHTML = ''; // Clear previous content
 
     if (notifications.length === 0) {
         displayMessage("You currently have no new notifications.", 'info');
         notificationListUl.style.display = 'none';
-        markAllReadBtn.style.display = 'none';
+        if (markAllReadBtn) markAllReadBtn.style.display = 'none';
         return;
     }
 
@@ -36,7 +40,6 @@ function renderNotifications(notifications) {
             unreadCount++;
         }
         
-        // Format the date
         const dateString = new Date(notification.created_at).toLocaleDateString('en-US', {
             year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
@@ -45,7 +48,6 @@ function renderNotifications(notifications) {
         listItem.className = `notification-item ${isRead ? 'read' : 'unread'}`;
         listItem.dataset.notificationId = notification.id;
 
-        // Note: The click handler will be added later for marking individual items as read
         listItem.innerHTML = `
             <div class="icon">
                 <i class="fas fa-bell"></i>
@@ -62,18 +64,18 @@ function renderNotifications(notifications) {
     });
 
     notificationListUl.style.display = 'block';
-    markAllReadBtn.style.display = (unreadCount > 0) ? 'block' : 'none';
+    if (markAllReadBtn) {
+        markAllReadBtn.style.display = (unreadCount > 0) ? 'block' : 'none';
+    }
 }
-
 
 /**
  * Fetches the notification data from the API and initiates rendering.
  */
 async function loadNotifications() {
-    loadingState.style.display = 'block'; 
+    if (loadingState) loadingState.style.display = 'block'; 
 
     try {
-        // GET request to the /notifications/ endpoint
         const data = await apiFetch('/notifications/', 'GET'); 
 
         if (Array.isArray(data)) {
@@ -83,28 +85,37 @@ async function loadNotifications() {
         }
 
     } catch (error) {
-        notificationListUl.style.display = 'none';
-        markAllReadBtn.style.display = 'none';
-        displayMessage(`Failed to load notifications: ${error.message}`, 'error');
+        if (notificationListUl) notificationListUl.style.display = 'none';
+        if (markAllReadBtn) markAllReadBtn.style.display = 'none';
+        
+        let errorMessage = `Failed to load notifications: ${error.message}`;
+        
+        // REDIRECT UPDATED: Handle session expiration
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+            errorMessage = 'Session expired. Redirecting to login...';
+            setTimeout(() => { window.location.href = '/'; }, 2000);
+        }
+        
+        displayMessage(errorMessage, 'error');
     } finally {
-        loadingState.style.display = 'none';
+        if (loadingState) loadingState.style.display = 'none';
     }
 }
 
 /**
- * Sends a request to the API to mark all notifications for the user as read.
+ * Sends a request to the API to mark all notifications as read.
  */
 async function markAllNotificationsAsRead() {
     if (!confirm("Are you sure you want to mark all notifications as read?")) {
         return;
     }
     
-    // Disable the button and show loading state
+    if (!markAllReadBtn) return;
+
     markAllReadBtn.disabled = true;
     const originalText = markAllReadBtn.innerHTML;
     markAllReadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     
-    // Since this is a modifying action (POST), we need the CSRF token
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
         displayMessage('Action failed: Security token missing.', 'error');
@@ -112,14 +123,11 @@ async function markAllNotificationsAsRead() {
         markAllReadBtn.innerHTML = originalText;
         return;
     }
+    
     const headers = { 'X-CSRFToken': csrfToken };
     
     try {
-        // Assuming your backend has a dedicated endpoint for this action
-        // Example: /notifications/mark_all_read/
         await apiFetch('/notifications/mark_all_read/', 'POST', {}, headers); 
-        
-        // Success: Re-render the list to update the visual state
         displayMessage('All notifications marked as read.', 'success');
         loadNotifications(); 
         

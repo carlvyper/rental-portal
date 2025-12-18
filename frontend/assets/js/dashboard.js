@@ -4,7 +4,7 @@
 // It also contains logic specific to the dashboard page itself.
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Only run dashboard specific logic if on dashboard.html
+    // UPDATED: Check for the element existence instead of the .html filename
     if (document.getElementById('tenantUsername')) {
         loadDashboardData();
     }
@@ -15,17 +15,24 @@ async function loadDashboardData() {
         const data = await apiFetch('/dashboard-counts/', 'GET');
         
         // Update Welcome Message
-        document.getElementById('tenantUsername').textContent = data.username.toUpperCase();
+        const usernameElement = document.getElementById('tenantUsername');
+        if (usernameElement && data.username) {
+            usernameElement.textContent = data.username.toUpperCase();
+        }
         
         // Update Stats
-        document.getElementById('notificationCount').textContent = data.unread_notifications;
-        document.getElementById('open-complaints-count').textContent = data.open_complaints;
+        const notifElement = document.getElementById('notificationCount');
+        const complaintElement = document.getElementById('open-complaints-count');
+        
+        if (notifElement) notifElement.textContent = data.unread_notifications;
+        if (complaintElement) complaintElement.textContent = data.open_complaints;
         
     } catch (error) {
         console.error('Failed to load dashboard data:', error.message);
-        // Optionally redirect to login if 401
-        if (error.message.includes('401')) { 
-            window.location.href = 'login.html'; 
+        
+        // REDIRECT UPDATED: Changed from login.html to root path /
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) { 
+            window.location.href = '/'; 
         }
     }
 }

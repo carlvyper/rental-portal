@@ -28,7 +28,8 @@ async function handleRegistration(e) {
         // Successful registration and automatic login (as per views.py)
         displayMessage('Registration successful! Redirecting to dashboard...', 'success', 'message-container');
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            // REDIRECT UPDATED: Changed from dashboard.html to /dashboard/
+            window.location.href = '/dashboard/';
         }, 1500);
 
     } catch (error) {
