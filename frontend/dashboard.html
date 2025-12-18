@@ -14,13 +14,13 @@
         <aside class="sidebar">
             <div class="logo">Rental Portal</div>
             <nav class="main-nav">
-                <a href="dashboard.html" class="nav-item active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-                <a href="pay-rent.html" class="nav-item"><i class="fas fa-money-check-alt"></i> <span>Pay Rent</span></a>
-                <a href="payment-history.html" class="nav-item"><i class="fas fa-history"></i> <span>Payment History</span></a>
-                <a href="submit-complaint.html" class="nav-item"><i class="fas fa-wrench"></i> <span>Complaints</span></a>
-                <a href="submit-request.html" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests</span></a>
-                <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> <span>Notifications</span></a>
-                <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
+                <a href="/dashboard/" class="nav-item active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="/pay-rent/" class="nav-item"><i class="fas fa-money-check-alt"></i> <span>Pay Rent</span></a>
+                <a href="/payment-history/" class="nav-item"><i class="fas fa-history"></i> <span>Payment History</span></a>
+                <a href="/submit-complaint/" class="nav-item"><i class="fas fa-wrench"></i> <span>Complaints</span></a>
+                <a href="/submit-request/" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests</span></a>
+                <a href="/notifications/" class="nav-item"><i class="fas fa-bell"></i> <span>Notifications</span></a>
+                <a href="/profile/" class="nav-item"><i class="fas fa-user-circle"></i> <span>Profile</span></a>
             </nav>
             <button class="btn logout-btn" id="logoutButton" onclick="handleLogout()">Log Out</button>
         </aside>
@@ -37,27 +37,27 @@
                 <div class="stat-card">
                     <h3>Unread Notifications</h3>
                     <p id="notificationCount">---</p>
-                    <a href="notifications.html">View All Alerts</a>
+                    <a href="/notifications/">View All Alerts</a>
                 </div>
 
                 <div class="stat-card">
                     <h3>Open Complaints</h3>
                     <p id="open-complaints-count">---</p>
-                    <a href="submit-complaint.html">Manage Complaints</a>
+                    <a href="/submit-complaint/">Manage Complaints</a>
                 </div>
             </section>
 
             <section class="quick-actions">
                 <h2>Quick Actions</h2>
-                <a href="pay-rent.html" class="card action-item">
+                <a href="/pay-rent/" class="card action-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Submit Rent Payment</span>
                 </a>
-                <a href="submit-request.html" class="card action-item">
+                <a href="/submit-request/" class="card action-item">
                     <i class="fas fa-tools"></i>
                     <span>Lodge Maintenance Request</span>
                 </a>
-                <a href="payment-history.html" class="card action-item">
+                <a href="/payment-history/" class="card action-item">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Review Payment History</span>
                 </a>
@@ -68,7 +68,8 @@
             <p>&copy; 2025 Rental Portal</p>
         </footer>
     </div>
-<script src="{% static 'assets/js/utils.js' %}"></script>
+
+    <script src="{% static 'assets/js/utils.js' %}"></script>
     <script src="{% static 'assets/js/script.js' %}"></script>
 </body>
 </html>
